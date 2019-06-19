@@ -118,6 +118,42 @@ class ClangCCompiler(ClangCompiler, CCompiler):
         return basic
 
 
+class EmscriptenCCompiler(ClangCompiler, CCompiler):
+    def __init__(self, exelist, version, compiler_type, for_machine: MachineChoice, is_cross, exe_wrapper=None, **kwargs):
+        if not is_cross:
+            raise MesonException('Emscripten compiler can only be used for cross compilation.')
+        CCompiler.__init__(self, exelist, version, for_machine, is_cross, exe_wrapper, **kwargs)
+        ClangCompiler.__init__(self, compiler_type)
+        default_warn_args = ['-Wall', '-Winvalid-pch']
+        self.warn_args = {'0': [],
+                          '1': default_warn_args,
+                          '2': default_warn_args + ['-Wextra'],
+                          '3': default_warn_args + ['-Wextra', '-Wpedantic']}
+        self.id = 'emscripten'
+
+    def get_options(self):
+        opts = CCompiler.get_options(self)
+        return opts
+
+    def get_option_compile_args(self, options):
+        return []
+
+    def get_option_link_args(self, options):
+        return []
+
+    def get_linker_always_args(self):
+        return []
+
+    def get_asneeded_args(self):
+        return []
+
+    def get_lundef_args(self):
+        return []
+
+    def build_rpath_args(self, *args, **kwargs):
+        return []
+
+
 class ArmclangCCompiler(ArmclangCompiler, CCompiler):
     def __init__(self, exelist, version, compiler_type, for_machine: MachineChoice, is_cross, exe_wrapper=None, **kwargs):
         CCompiler.__init__(self, exelist, version, for_machine, is_cross, exe_wrapper, **kwargs)

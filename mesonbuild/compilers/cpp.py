@@ -184,6 +184,42 @@ class ClangCPPCompiler(ClangCompiler, CPPCompiler):
         return ['-lstdc++']
 
 
+class EmscriptenCPPCompiler(ClangCompiler, CPPCompiler):
+    def __init__(self, exelist, version, compiler_type, for_machine: MachineChoice, is_cross, exe_wrapper=None, **kwargs):
+        if not is_cross:
+            raise MesonException('Emscripten compiler can only be used for cross compilation.')
+        CPPCompiler.__init__(self, exelist, version, for_machine, is_cross, exe_wrapper, **kwargs)
+        ClangCPPCompiler.__init__(self, exelist, version, compiler_type, for_machine, is_cross, exe_wrapper, **kwargs)
+        default_warn_args = ['-Wall', '-Winvalid-pch']
+        self.warn_args = {'0': [],
+                          '1': default_warn_args,
+                          '2': default_warn_args + ['-Wextra'],
+                          '3': default_warn_args + ['-Wextra', '-Wpedantic']}
+        self.id = 'emscripten'
+
+    def get_options(self):
+        opts = CPPCompiler.get_options(self)
+        return opts
+
+    def get_option_compile_args(self, options):
+        return []
+
+    def get_option_link_args(self, options):
+        return []
+
+    def get_linker_always_args(self):
+        return []
+
+    def get_asneeded_args(self):
+        return []
+
+    def get_lundef_args(self):
+        return []
+
+    def build_rpath_args(self, *args, **kwargs):
+        return []
+
+
 class ArmclangCPPCompiler(ArmclangCompiler, CPPCompiler):
     def __init__(self, exelist, version, compiler_type, for_machine: MachineChoice, is_cross, exe_wrapper=None, **kwargs):
         CPPCompiler.__init__(self, exelist, version, for_machine, is_cross, exe_wrapper, **kwargs)

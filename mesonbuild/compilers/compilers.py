@@ -552,7 +552,7 @@ def get_base_link_args(options, linker, is_shared_module):
         pass
     # These do not need a try...except
     if not is_shared_module and option_enabled(linker.base_options, options, 'b_lundef'):
-        args.append('-Wl,--no-undefined')
+        args += linker.get_lundef_args()
     as_needed = option_enabled(linker.base_options, options, 'b_asneeded')
     bitcode = option_enabled(linker.base_options, options, 'b_bitcode')
     # Shared modules cannot be built with bitcode_bundle because
@@ -561,7 +561,7 @@ def get_base_link_args(options, linker, is_shared_module):
         args.append('-Wl,-bitcode_bundle')
     elif as_needed:
         # -Wl,-dead_strip_dylibs is incompatible with bitcode
-        args.append(linker.get_asneeded_args())
+        args += linker.get_asneeded_args()
     try:
         crt_val = options['b_vscrt'].value
         buildtype = options['buildtype'].value
@@ -1407,6 +1407,7 @@ class CompilerType(enum.Enum):
     CLANG_STANDARD = 10
     CLANG_OSX = 11
     CLANG_MINGW = 12
+    CLANG_EMSCRIPTEN = 13
     # Possibly clang-cl?
 
     ICC_STANDARD = 20
@@ -1892,9 +1893,12 @@ class GnuLikeCompiler(abc.ABC):
         # Hence, we don't need to differentiate between OS and ld
         # for the sake of adding as-needed support
         if self.compiler_type.is_osx_compiler:
-            return '-Wl,-dead_strip_dylibs'
+            return ['-Wl,-dead_strip_dylibs']
         else:
-            return '-Wl,--as-needed'
+            return ['-Wl,--as-needed']
+
+    def get_lundef_args(self):
+        return ['-Wl,--no-undefined']
 
     def get_pic_args(self):
         if self.compiler_type.is_osx_compiler or self.compiler_type.is_windows_compiler:
