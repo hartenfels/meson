@@ -290,6 +290,10 @@ class CLikeCompiler:
         """
         return ['-Wl,--out-implib=' + implibname]
 
+    def get_sanity_check_binary_suffix(self):
+        # Is a valid executable output for most toolchains and platforms
+        return '.exe'
+
     def sanity_check_impl(self, work_dir, environment, sname, code):
         mlog.debug('Sanity testing ' + self.get_display_language() + ' compiler:', ' '.join(self.exelist))
         mlog.debug('Is cross compiler: %s.' % str(self.is_cross))
@@ -308,8 +312,7 @@ class CLikeCompiler:
                 mode = 'compile'
         extra_flags = self._get_basic_compiler_args(environment, mode)
 
-        # Is a valid executable output for all toolchains and platforms
-        binname += '.exe'
+        binname += self.get_sanity_check_binary_suffix()
         # Write binary check source
         binary_name = os.path.join(work_dir, binname)
         with open(source_name, 'w') as ofile:

@@ -153,6 +153,9 @@ class EmscriptenCCompiler(ClangCompiler, CCompiler):
     def build_rpath_args(self, *args, **kwargs):
         return []
 
+    def get_sanity_check_binary_suffix(self):
+        return '.js'
+
 
 class ArmclangCCompiler(ArmclangCompiler, CCompiler):
     def __init__(self, exelist, version, compiler_type, for_machine: MachineChoice, is_cross, exe_wrapper=None, **kwargs):
