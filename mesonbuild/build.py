@@ -1433,7 +1433,7 @@ class Executable(BuildTarget):
             if machine.is_windows() or machine.is_cygwin() or 'cs' in self.compilers:
                 self.suffix = 'exe'
             elif machine.system == 'wasm':
-                self.suffix = 'js'
+                self.suffix = 'html' if self.gui_app else 'js'
             elif ('c' in self.compilers and self.compilers['c'].get_id().startswith('arm') or
                   'cpp' in self.compilers and self.compilers['cpp'].get_id().startswith('arm')):
                 self.suffix = 'axf'
